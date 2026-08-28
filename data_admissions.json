@@ -1,0 +1,29 @@
+[
+  {
+    "_id": "ADM-DE30E6F4",
+    "timestamp": "2026-08-27T18:19:49.247886+00:00",
+    "patient_id": "PT-4321-5482",
+    "patient_name": "Patient (PT-4321-5482)",
+    "aadhar_no": "548298214321",
+    "masked_aadhar": "XXXX-XXXX-4321",
+    "age": 64,
+    "gender": "Female",
+    "chief_complaint": "Crushing retrosternal chest pain radiating to left jaw with cold diaphoresis",
+    "vitals": {
+      "heart_rate": 112,
+      "resp_rate": 24,
+      "sbp": 164,
+      "dbp": 98,
+      "spo2": 94,
+      "temp_c": 36.6,
+      "pain_score": 9
+    },
+    "triage_level": 2,
+    "acuity_name": "KTAS / ESI Level 2 - Emergent (Immediate/10 min)",
+    "assigned_ward": "Adult Intensive Care Unit (ICU)",
+    "assigned_bed_id": "ICU-09",
+    "attending_doctor_id": "DOC-107",
+    "admission_risk_percent": 50,
+    "status": "ADMITTED_ACTIVE"
+  }
+]
