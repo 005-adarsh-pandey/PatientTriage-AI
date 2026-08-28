@@ -1,0 +1,58 @@
+[
+  {
+    "_id": "STF-201",
+    "name": "Sister Kavita Nair",
+    "role": "Senior Triage Nurse",
+    "assigned_ward": "Emergency Triage",
+    "shift": "Morning (07:00 - 15:00)",
+    "status": "On-Duty"
+  },
+  {
+    "_id": "STF-202",
+    "name": "Sister Sunita Rao",
+    "role": "ICU Staff Nurse",
+    "assigned_ward": "Adult ICU",
+    "shift": "Morning (07:00 - 15:00)",
+    "status": "On-Duty"
+  },
+  {
+    "_id": "STF-203",
+    "name": "Sister Deepa Kumari",
+    "role": "NICU Specialist Nurse",
+    "assigned_ward": "NICU",
+    "shift": "Morning (07:00 - 15:00)",
+    "status": "On-Duty"
+  },
+  {
+    "_id": "STF-204",
+    "name": "Ramesh Yadav",
+    "role": "Ward Boy / Patient Transport",
+    "assigned_ward": "General Ward & ER",
+    "shift": "Morning (07:00 - 15:00)",
+    "status": "Available"
+  },
+  {
+    "_id": "STF-205",
+    "name": "Suresh Paswan",
+    "role": "Housekeeping / Sanitization Staff",
+    "assigned_ward": "Operation Theatres",
+    "shift": "Morning (07:00 - 15:00)",
+    "status": "Available"
+  },
+  {
+    "_id": "STF-206",
+    "name": "Mohan Lal",
+    "role": "Housekeeping / Ward Cleaning",
+    "assigned_ward": "ICU & HDU",
+    "shift": "Morning (07:00 - 15:00)",
+    "status": "Available"
+  },
+  {
+    "_id": "STF-207",
+    "name": "Sister Pooja Sen",
+    "role": "Dialysis Technician & Nurse",
+    "assigned_ward": "Dialysis Center",
+    "shift": "Morning (07:00 - 15:00)",
+    "status": "On-Duty"
+  }
+]

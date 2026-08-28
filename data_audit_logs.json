@@ -1,0 +1,31 @@
+[
+  {
+    "timestamp": "2026-08-27T16:28:47.895269+00:00",
+    "event_type": "DOCTOR_LEAVE_UPDATE",
+    "doctor_id": "DOC-101",
+    "status": "On-Leave",
+    "reason": "Leave updated by Lead",
+    "backup_assigned": "DOC-107",
+    "_id": "98701f88-8abf-4a9a-a533-94e908747115"
+  },
+  {
+    "timestamp": "2026-08-27T16:49:24.387211+00:00",
+    "event_type": "DOCTOR_LEAVE_UPDATE",
+    "doctor_id": "DOC-101",
+    "status": "Available",
+    "reason": "Leave updated by Lead",
+    "backup_assigned": "DOC-107",
+    "_id": "e69c488d-34e6-4dd0-bc2a-75a2a45d5b90"
+  },
+  {
+    "timestamp": "2026-08-27T18:20:41.142749+00:00",
+    "event_type": "PATIENT_WARD_TRANSFER",
+    "patient_id": "PT-4321-5482",
+    "from_ward": "High Dependency Unit (HDU / Cardiac Telemetry)",
+    "from_bed": "HDU-07",
+    "to_ward": "icu",
+    "to_bed": "ICU-09",
+    "transferred_by": "RN-WardSupervisor",
+    "_id": "919a8728-7247-4e0c-a003-9eed754d71c5"
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "_id": "PT-4321-5482",
+    "patient_id": "PT-4321-5482",
+    "aadhar_no": "548298214321",
+    "masked_aadhar": "XXXX-XXXX-4321",
+    "name": "Patient (PT-4321-5482)",
+    "age": 64.0,
+    "gender": "Female",
+    "phone": "+91-9876543210",
+    "has_prior_history": false,
+    "total_past_visits": 1,
+    "chronic_conditions": [],
+    "allergies": [],
+    "registered_at": "2026-08-27T18:19:49.246935+00:00"
+  }
+]
