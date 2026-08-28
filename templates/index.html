@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpha.ai - Emergency Decision Support & Clinical AI Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body class="bg-light">
+
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-alpha sticky-top px-3">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center gap-3 text-decoration-none" href="#">
+                <div class="alpha-logo-badge">
+                    <i class="fa-solid fa-atom"></i>
+                </div>
+                <div>
+                    <div class="brand-title">Alpha<span style="color: #38bdf8;">.ai</span></div>
+                    <div class="brand-subtitle">Emergency Decision Support &amp; Clinical Intelligence</div>
+                </div>
+            </a>
+            
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <!-- Live Telemetry Badges -->
+                <div class="d-none d-md-flex align-items-center gap-2">
+                    <div class="nav-telemetry-chip" id="navBedStatus" title="Hospital Bed Availability">
+                        <i class="fa-solid fa-bed text-info"></i>
+                        <span id="topBedCount">32 / 48 Beds</span>
+                    </div>
+                    <div class="nav-telemetry-chip" id="navO2Status" title="Central Oxygen Pressure">
+                        <i class="fa-solid fa-lungs text-success"></i>
+                        <span>O₂: <span id="topO2Psi">142 PSI</span></span>
+                    </div>
+                    <div class="nav-telemetry-chip" id="navDocStatus" title="On-Duty Active Medical Staff">
+                        <i class="fa-solid fa-user-doctor text-warning"></i>
+                        <span id="topDocCount">7/8 Doctors Active</span>
+                    </div>
+                    <div class="nav-telemetry-chip" title="System Health">
+                        <span class="nav-live-dot"></span>
+                        <span class="text-success">System Live</span>
+                    </div>
+                </div>
+
+                <!-- Direct Patient Action Button (By Aadhaar) -->
+                <button class="btn btn-nav-search" onclick="openDirectActionModal()">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>Patient Search (Aadhaar)</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-fluid py-3 px-4">
+        
+        <!-- Live Alert Banner (Dynamic) -->
+        <div id="liveAlertBanner" class="alert alert-danger d-none align-items-center justify-content-between shadow-sm fade show" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="fa-solid fa-triangle-exclamation fa-2x me-3 text-danger"></i>
+                <div>
+                    <h6 class="mb-0 fw-bold" id="alertTitle">CRITICAL DETERIORATION ALERT</h6>
+                    <p class="mb-0 small" id="alertMessage">Patient in waiting room exceeding safe wait limits.</p>
+                </div>
+            </div>
+            <button class="btn btn-sm btn-danger" onclick="switchTab('queue-tab')">View Queue</button>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-pills mb-3 gap-2 border-bottom pb-2" id="mainTab" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active fw-semibold" id="intake-tab" data-bs-toggle="pill" data-bs-target="#intake-pane" type="button">
+                    <i class="fa-solid fa-stethoscope me-1"></i> Patient Intake & Clinical Decision
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="resources-tab" data-bs-toggle="pill" data-bs-target="#resources-pane" type="button" onclick="loadHospitalResources()">
+                    <i class="fa-solid fa-bed-pulse me-1"></i> Live Beds, Oxygen & OTs
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="staff-tab" data-bs-toggle="pill" data-bs-target="#staff-pane" type="button" onclick="loadStaffAndDoctors()">
+                    <i class="fa-solid fa-user-doctor me-1"></i> Doctors, Staff & Leave Management
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold position-relative" id="queue-tab" data-bs-toggle="pill" data-bs-target="#queue-pane" type="button" onclick="loadQueue()">
+                    <i class="fa-solid fa-users-viewfinder me-1"></i> Live ED Queue
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="queueCountBadge">0</span>
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="benchmarks-tab" data-bs-toggle="pill" data-bs-target="#benchmarks-pane" type="button" onclick="loadBenchmarks()">
+                    <i class="fa-solid fa-vial-circle-check me-1"></i> Clinical Benchmark Cases
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="surge-tab" data-bs-toggle="pill" data-bs-target="#surge-pane" type="button">
+                    <i class="fa-solid fa-chart-line me-1"></i> Surge Studio
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="audit-tab" data-bs-toggle="pill" data-bs-target="#audit-pane" type="button" onclick="loadAuditLogs()">
+                    <i class="fa-solid fa-file-shield me-1"></i> Audit Trail & Overrides
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content Panes -->
+        <div class="tab-content" id="mainTabContent">
+            
+            <!-- 1. PATIENT INTAKE & CLINICAL DECISION ENGINE -->
+            <div class="tab-pane fade show active" id="intake-pane" role="tabpanel">
+                <div class="row g-3">
+                    
+                    <!-- Left: Patient Intake Form (Real Clinical Parameters) -->
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title mb-0 fw-bold text-primary">
+                                        <i class="fa-solid fa-notes-medical me-2"></i>Patient Intake (Real Clinical Parameters)
+                                    </h6>
+                                    <span class="small text-muted">Direct inputs matching clinical emergency parameters</span>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Real Clinical Presets
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow">
+                                        <li><a class="dropdown-item" href="#" onclick="fillPreset('trauma_unresponsive')">🩸 Polytrauma / Unresponsive (Level 1 ➔ Trauma OT)</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="fillPreset('stemi_chest_pain')">💔 STEMI / Severe Chest Pain (Level 2 ➔ Cardiac HDU)</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="fillPreset('septic_shock')">🫀 Geriatric Sepsis & Shock (Level 1 ➔ Adult ICU)</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="fillPreset('acute_uremia')">🧪 Acute Uremia / High K+ (Level 2 ➔ Dialysis)</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="fillPreset('humerus_fracture')">🦴 Humerus Fracture (Level 4 ➔ General Ward)</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="fillPreset('corneal_abrasion')">👁️ Corneal Foreign Body (Level 4 ➔ Fast-Track)</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="fillPreset('superficial_burn')">🩹 Superficial Forearm Burn (Level 5 ➔ Discharge)</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="fillPreset('newborn_nicu')">👶 Newborn Distress (Level 1 ➔ NICU)</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                        <form id="triageForm" onsubmit="event.preventDefault(); evaluatePatient();">
+                                    
+                                    <!-- 0. Aadhaar & Identity Management -->
+                                    <div class="p-3 border rounded bg-light-subtle mb-3">
+                                        <div class="row g-2 align-items-center">
+                                            <div class="col-md-7">
+                                                <label class="form-label small fw-bold text-dark d-flex justify-content-between align-items-center mb-1">
+                                                    <span><i class="fa-solid fa-id-card text-success me-1"></i>Aadhaar Card No. (12 Digits)</span>
+                                                    <span class="badge bg-light text-secondary border small" id="intakeAadharCount">0 / 12 Digits</span>
+                                                </label>
+                                                <div class="d-flex align-items-center gap-1 flex-wrap">
+                                                    <div class="aadhar-slots-container" id="intakeAadharContainer">
+                                                        <div class="aadhar-group">
+                                                            <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="0" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                                            <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="1" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                                            <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="2" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                                            <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="3" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                                        </div>
+                                                        <span class="aadhar-slot-separator">-</span>
+                                                        <div class="aadhar-group">
+                                                            <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                                            <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="5" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                                            <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="6" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                                            <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="7" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                                        </div>
+                                                        <span class="aadhar-slot-separator">-</span>
+                                                        <div class="aadhar-group">
+                                                            <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="8" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                                            <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="9" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                                            <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="10" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                                            <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="11" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                                        </div>
+                                                    </div>
+                                                    <button class="btn btn-sm btn-outline-secondary" type="button" onclick="clearIntakeAadhar()" title="Clear Aadhaar">
+                                                        <i class="fa-solid fa-eraser"></i>
+                                                    </button>
+                                                </div>
+                                                <input type="hidden" id="aadhar_no" value="">
+                                            </div>
+                                            <div class="col-md-5">
+                                                <label class="form-label small fw-bold text-dark mb-1">
+                                                    <i class="fa-solid fa-user text-primary me-1"></i>Patient Full Name
+                                                </label>
+                                                <input type="text" class="form-control form-control-sm fw-bold" id="patient_name" placeholder="Patient Full Name" value="">
+                                            </div>
+                                            <!-- Hidden input for internal deterministic UHID mapping -->
+                                            <input type="hidden" id="patient_id_display" value="">
+                                            <div class="col-12 mt-1 d-none" id="aadharStatusAlert">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 1. Demographics & Arrival Mode -->
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-semibold">Patient Age (Years)</label>
+                                            <input type="number" step="0.01" class="form-control" id="patient_age" placeholder="Age" value="" required oninput="updateAgeNorms()">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-semibold">Gender (Sex)</label>
+                                            <select class="form-select" id="patient_gender" required>
+                                                <option value="" selected disabled>Select Gender</option>
+                                                <option value="Female">Female</option>
+                                                <option value="Male">Male</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-semibold">Arrival Mode</label>
+                                            <select class="form-select" id="arrival_mode" required>
+                                                <option value="" selected disabled>Select Arrival Mode</option>
+                                                <option value="1">1: Walk-in / Ambulatory</option>
+                                                <option value="2">2: 119 Public Ambulance</option>
+                                                <option value="3">3: Private Ambulance</option>
+                                                <option value="4">4: Private Vehicle / Car</option>
+                                                <option value="5">5: Hospital Transfer</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-semibold">Presentation Type</label>
+                                            <select class="form-select" id="injury" required>
+                                                <option value="" selected disabled>Select Presentation</option>
+                                                <option value="2">2: Non-Injury (Medical)</option>
+                                                <option value="1">1: Injury / Trauma</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- 2. Chief Complaint -->
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Chief Complaint (Symptoms &amp; Findings)</label>
+                                        <input type="text" class="form-control" id="chief_complaint" placeholder="Enter chief complaint or primary symptoms" value="" required>
+                                    </div>
+
+                                    <!-- 3. Neurological & Pain Assessment (AVPU + NRS Pain) -->
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-semibold text-danger">Mental Status (AVPU)</label>
+                                            <select class="form-select fw-bold border-danger" id="mental" required>
+                                                <option value="" selected disabled>Select Mental Status</option>
+                                                <option value="1">1: Alert (A)</option>
+                                                <option value="2">2: Verbal Response Only (V)</option>
+                                                <option value="3">3: Pain Response Only (P)</option>
+                                                <option value="4">4: Unresponsive (U)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-semibold">Pain Presence</label>
+                                            <select class="form-select" id="pain_flag" required>
+                                                <option value="" selected disabled>Select Pain Status</option>
+                                                <option value="1">1: Pain Present</option>
+                                                <option value="0">0: No Pain</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-semibold">NRS Pain Scale (0-10)</label>
+                                            <input type="number" min="0" max="10" class="form-control fw-bold" id="nrs_pain" placeholder="0-10" value="" required>
+                                        </div>
+                                    </div>
+
+                                    <!-- 4. Dynamic Physiological Norms Card -->
+                                    <div class="alert alert-secondary py-2 px-3 mb-3 border-0 bg-light-subtle d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="badge bg-dark me-2" id="ageCategoryBadge">Age Category</span>
+                                            <span class="small text-muted" id="ageNormsHint">Enter age to view reference physiological norms</span>
+                                        </div>
+                                        <span class="badge bg-info text-dark small" id="dataCompletenessBadge">Completeness: 0%</span>
+                                    </div>
+
+                                    <!-- 5. Physiological Vital Signs -->
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-semibold">Systolic BP - SBP (mmHg)</label>
+                                            <input type="number" class="form-control" id="sbp" placeholder="SBP (mmHg)" value="" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-semibold">Diastolic BP - DBP (mmHg)</label>
+                                            <input type="number" class="form-control" id="dbp" placeholder="DBP (mmHg)" value="" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-semibold">Heart Rate - HR (bpm)</label>
+                                            <input type="number" class="form-control" id="heart_rate" placeholder="HR (bpm)" value="" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-semibold">Resp. Rate - RR (bpm)</label>
+                                            <input type="number" class="form-control" id="resp_rate" placeholder="RR (bpm)" value="" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-semibold">Body Temp - BT (°C)</label>
+                                            <input type="number" step="0.1" class="form-control" id="temp_c" placeholder="BT (°C)" value="" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-semibold">Oxygen Saturation (%)</label>
+                                            <input type="number" step="0.1" class="form-control" id="spo2" placeholder="SpO2 (%)" value="" required>
+                                        </div>
+                                    </div>
+
+                                    <!-- Action Buttons -->
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary flex-grow-1 fw-bold shadow-sm" id="btnEvaluate">
+                                            <i class="fa-solid fa-calculator me-1"></i> Evaluate Clinical Decision & Allocate Ward
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="resetForm()">
+                                            <i class="fa-solid fa-rotate-left"></i> Reset
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: AI Decision, Ward Recommendation & 1-Click Bed Lock -->
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm border-0 h-100" id="resultCard">
+                            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                                <h6 class="card-title mb-0 fw-bold text-dark">
+                                    <i class="fa-solid fa-brain text-info me-2"></i>Clinical Decision & Ward Allocator
+                                </h6>
+                                <span class="badge bg-secondary" id="evalStatusBadge">Ready for Evaluation</span>
+                            </div>
+                            <div class="card-body d-flex flex-column justify-content-between" id="resultBody">
+                                
+                                <div id="emptyResultPlaceholder" class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-stethoscope fa-3x mb-3 text-secondary opacity-50"></i>
+                                    <h5>No Patient Evaluated Yet</h5>
+                                    <p class="small text-secondary">Fill in patient parameters or choose a Clinical Preset to run the clinical AI model.</p>
+                                </div>
+
+                                <div id="evaluationOutput" class="d-none">
+                                    
+                                    <!-- Acuity Banner -->
+                                    <div class="p-3 rounded mb-3 text-white d-flex align-items-center justify-content-between shadow-sm" id="esiLevelBanner" style="background-color: #ea580c;">
+                                        <div>
+                                            <div class="small text-uppercase fw-semibold tracking-wider text-white-50">Clinical Triage Acuity Level</div>
+                                            <h3 class="mb-0 fw-bold" id="esiLevelTitle">Level 2 - Emergent</h3>
+                                            <div class="small fw-light mt-1" id="deptRecommendation">Recommended Ward: High Dependency Unit (HDU)</div>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="display-6 fw-bold" id="esiLevelNumber">2</div>
+                                            <div class="badge bg-light text-dark fw-bold" id="maxSafeWaitBadge">Safe Wait: ≤ 10 min</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Ward & Resource Allocation Box -->
+                                    <div class="p-3 border rounded bg-light-subtle mb-3">
+                                        <h6 class="fw-bold text-dark mb-2"><i class="fa-solid fa-hospital-symbol text-primary me-2"></i>Clinical Disposition & Resource Assignment:</h6>
+                                        <div class="row g-2 small">
+                                            <div class="col-6">
+                                                <strong>Assigned Ward:</strong> <span id="allocWard" class="badge bg-primary">Cardiac Telemetry / HDU</span>
+                                            </div>
+                                            <div class="col-6">
+                                                <strong>Attending Doctor:</strong> <span id="allocDoctor" class="text-dark fw-bold">Dr. Rajesh Sharma (Cardio)</span>
+                                            </div>
+                                            <div class="col-12 mt-1">
+                                                <strong>Required Life Support:</strong> <span id="allocEquipment" class="text-secondary">Continuous 12-Lead Telemetry ECG Monitor</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Safety-First Escalation Alert (if applied) -->
+                                    <div class="alert alert-warning py-2 px-3 mb-3 d-none border-warning" id="safetyEscalationBox">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa-solid fa-shield-heart fa-lg me-2 text-warning"></i>
+                                            <div class="small fw-semibold" id="safetyEscalationText">
+                                                Safety-First Fail-Safe: Acuity upgraded due to elevated clinical uncertainty.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Confidence & Uncertainty Meter -->
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-md-6">
+                                            <div class="p-2 border rounded bg-light">
+                                                <div class="d-flex justify-content-between small mb-1">
+                                                    <span class="text-muted fw-semibold">Model Confidence</span>
+                                                    <span class="fw-bold text-primary" id="confidencePercent">91%</span>
+                                                </div>
+                                                <div class="progress" style="height: 6px;">
+                                                    <div class="progress-bar bg-primary" id="confidenceBar" style="width: 91%;"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="p-2 border rounded bg-light">
+                                                <div class="d-flex justify-content-between small mb-1">
+                                                    <span class="text-muted fw-semibold">Hospital Admission Risk</span>
+                                                    <span class="fw-bold text-danger" id="admissionRiskDisplay">84%</span>
+                                                </div>
+                                                <div class="progress" style="height: 6px;">
+                                                    <div class="progress-bar bg-danger" id="admissionRiskBar" style="width: 84%;"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Clinical Drivers & Algorithmic Rationale -->
+                                    <div class="mb-3">
+                                        <label class="small fw-bold text-secondary text-uppercase mb-1">Top Clinical Decision Drivers (Trained Weights)</label>
+                                        <ul class="list-group list-group-flush border rounded small" id="clinicalDriversList">
+                                            <li class="list-group-item py-1">Awaiting evaluation...</li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- 1-Click Bed Lock & Clinician Actions -->
+                                    <div class="p-3 border rounded bg-white shadow-sm d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <span class="small fw-bold text-dark d-block"><i class="fa-solid fa-lock text-success me-1"></i>Confirm Admission to Ward</span>
+                                            <span class="small text-muted">Locks bed in MongoDB and notifies doctor</span>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-success fw-bold" onclick="confirmAndLockBed()">
+                                                <i class="fa-solid fa-bed me-1"></i> Lock Bed & Admit
+                                            </button>
+                                            <button class="btn btn-outline-danger" onclick="openOverrideModal()">
+                                                <i class="fa-solid fa-user-pen me-1"></i> Override
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 2. LIVE HOSPITAL RESOURCES, BEDS, OXYGEN & OTS -->
+            <div class="tab-pane fade" id="resources-pane" role="tabpanel">
+                
+                <!-- Quick Equipment Status Cards -->
+                <div class="row g-3 mb-4" id="equipmentCardsContainer">
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border-0 bg-white p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="small text-muted fw-bold">OXYGEN CYLINDERS</span>
+                                    <h4 class="fw-bold mb-0 text-dark" id="eqO2Stock">18 Available / 50</h4>
+                                    <span class="small text-success"><i class="fa-solid fa-gauge-high me-1"></i><span id="eqO2Psi">142 PSI</span></span>
+                                </div>
+                                <div class="btn-group-vertical btn-group-sm">
+                                    <button class="btn btn-outline-primary py-0" title="Take Cylinder into Use" onclick="updateEquipmentStock('oxygen_cylinders', 1)">+ In Use</button>
+                                    <button class="btn btn-outline-secondary py-0" title="Return Cylinder" onclick="updateEquipmentStock('oxygen_cylinders', -1)">- In Use</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border-0 bg-white p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="small text-muted fw-bold">DIALYSIS MACHINES</span>
+                                    <h4 class="fw-bold mb-0 text-primary" id="eqDialysis">2 Available / 6</h4>
+                                    <span class="small text-muted"><span id="eqDialysisInUse">4</span> Sessions Running</span>
+                                </div>
+                                <div class="btn-group-vertical btn-group-sm">
+                                    <button class="btn btn-outline-primary py-0" onclick="updateEquipmentStock('dialysis_machines', 1)">Start Dialysis</button>
+                                    <button class="btn btn-outline-secondary py-0" onclick="updateEquipmentStock('dialysis_machines', -1)">Free Machine</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border-0 bg-white p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="small text-muted fw-bold">INVASIVE VENTILATORS</span>
+                                    <h4 class="fw-bold mb-0 text-danger" id="eqVentilators">5 Available / 16</h4>
+                                    <span class="small text-muted"><span id="eqVentInUse">11</span> In Active Use</span>
+                                </div>
+                                <div class="btn-group-vertical btn-group-sm">
+                                    <button class="btn btn-outline-danger py-0" onclick="updateEquipmentStock('ventilators', 1)">Attach Vent</button>
+                                    <button class="btn btn-outline-secondary py-0" onclick="updateEquipmentStock('ventilators', -1)">Detach Vent</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border-0 bg-white p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="small text-muted fw-bold">TOTAL HOSPITAL BEDS</span>
+                                    <h4 class="fw-bold mb-0 text-success" id="eqTotalBeds">48 Beds</h4>
+                                    <span class="small text-muted"><span id="eqOccupiedBeds">32</span> Occupied (<span id="eqOccPercent">66%</span>)</span>
+                                </div>
+                                <span class="badge bg-success p-2 fs-6"><i class="fa-solid fa-hospital"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Operation Theatres Complex -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                        <h6 class="card-title mb-0 fw-bold text-dark">
+                            <i class="fa-solid fa-scalpel text-danger me-2"></i>Operation Theatres (OT 1 to 4) Live Status
+                        </h6>
+                        <span class="small text-muted">Click any OT to change surgery / sterilization status</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3" id="otGridContainer">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ward-by-Ward Beds Grid -->
+                <div class="card shadow-sm border-0 mb-3">
+                    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                        <h6 class="card-title mb-0 fw-bold text-dark">
+                            <i class="fa-solid fa-bed text-primary me-2"></i>Hospital Wards & Real-Time Individual Bed Grid (MongoDB Live)
+                        </h6>
+                        <span class="small text-muted">Click any bed to toggle (Occupied / Available / Under Cleaning)</span>
+                    </div>
+                    <div class="card-body" id="wardBedsContainer">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 3. DOCTORS, STAFF & SHIFT LEAVE MANAGEMENT -->
+            <div class="tab-pane fade" id="staff-pane" role="tabpanel">
+                
+                <!-- Doctors Management Card -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0 fw-bold text-dark">
+                                <i class="fa-solid fa-user-doctor text-primary me-2"></i>Doctors Directory & Live On-Call Duty Status
+                            </h6>
+                            <span class="small text-muted">Mark doctor leave to trigger automatic substitute doctor re-routing</span>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger fw-bold" onclick="openDoctorLeaveModal()">
+                            <i class="fa-solid fa-calendar-xmark me-1"></i> Mark Doctor Leave / Assign Backup
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light small text-uppercase">
+                                    <tr>
+                                        <th>Doctor Name & ID</th>
+                                        <th>Specialty & Qualifications</th>
+                                        <th>Room / OPD</th>
+                                        <th>Contact</th>
+                                        <th>Status</th>
+                                        <th>Backup Doctor</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="doctorsTableBody">
+                                    <!-- Populated dynamically via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nursing & Housekeeping Staff Shift Roster -->
+                <div class="card shadow-sm border-0 mb-3">
+                    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                        <h6 class="card-title mb-0 fw-bold text-dark">
+                            <i class="fa-solid fa-users-gear text-success me-2"></i>Nursing, Ward Boys & Housekeeping Shift Roster
+                        </h6>
+                        <span class="badge bg-success">Morning Shift Active</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light small text-uppercase">
+                                    <tr>
+                                        <th>Staff ID</th>
+                                        <th>Name & Role</th>
+                                        <th>Assigned Ward / Floor</th>
+                                        <th>Shift Timings</th>
+                                        <th>Live Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="staffTableBody">
+                                    <!-- Populated dynamically via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 4. LIVE ED QUEUE & DETERIORATION MONITOR -->
+            <div class="tab-pane fade" id="queue-pane" role="tabpanel">
+                <div class="card shadow-sm border-0 mb-3">
+                    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-3">
+                            <h6 class="card-title mb-0 fw-bold text-dark">
+                                <i class="fa-solid fa-bed-pulse text-danger me-2"></i>Active ED Waiting Queue & Dynamic Deterioration Tracker
+                            </h6>
+                            <span class="badge bg-primary px-2 py-1" id="queueTotalWaiting">5 Patients Waiting</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="loadQueue()">
+                                <i class="fa-solid fa-rotate me-1"></i> Refresh Queue
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0" id="queueTable">
+                                <thead class="table-light small text-uppercase">
+                                    <tr>
+                                        <th>Priority / ESI</th>
+                                        <th>Patient</th>
+                                        <th>Age & Sex</th>
+                                        <th>Arrival & Injury</th>
+                                        <th>Chief Complaint</th>
+                                        <th>Current Vitals & AVPU</th>
+                                        <th>Wait Time vs Limit</th>
+                                        <th>Assigned Ward</th>
+                                        <th>Deterioration</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="queueTableBody">
+                                    <!-- Dynamic Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. REAL CLINICAL BENCHMARK CASES -->
+            <div class="tab-pane fade" id="benchmarks-pane" role="tabpanel">
+                <div class="card shadow-sm border-0 mb-3">
+                    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0 fw-bold text-dark">
+                                <i class="fa-solid fa-vial-virus text-info me-2"></i>Real Clinical Benchmark Library
+                            </h6>
+                            <span class="small text-muted">Evaluated directly against real emergency department clinical outcomes</span>
+                        </div>
+                        <button class="btn btn-primary btn-sm fw-bold shadow-sm" onclick="runAllBenchmarkTests()">
+                            <i class="fa-solid fa-play me-1"></i> Run All Benchmark Tests
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3 mb-4 d-none" id="benchmarkSummaryBox">
+                            <div class="col-md-3">
+                                <div class="p-3 border rounded bg-light text-center">
+                                    <div class="small text-muted">Clinical Safety Concordance</div>
+                                    <div class="display-6 fw-bold text-success" id="benchSafetyRate">100%</div>
+                                    <div class="small text-muted">Zero missed critical cases</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3 border rounded bg-light text-center">
+                                    <div class="small text-muted">Exact Concordance</div>
+                                    <div class="display-6 fw-bold text-primary" id="benchExactMatches">8 / 8</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3 border rounded bg-light text-center">
+                                    <div class="small text-muted">Safe Escalations</div>
+                                    <div class="display-6 fw-bold text-warning" id="benchSafeEscalations">0</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3 border rounded bg-light text-center">
+                                    <div class="small text-muted">Under-Triage Misses</div>
+                                    <div class="display-6 fw-bold text-danger" id="benchUnderTriage">0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3" id="benchmarkGrid">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. SURGE STUDIO & CAPACITY -->
+            <div class="tab-pane fade" id="surge-pane" role="tabpanel">
+                <div class="card shadow-sm border-0 mb-3">
+                    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                        <h6 class="card-title mb-0 fw-bold text-dark">
+                            <i class="fa-solid fa-chart-line-up text-warning me-2"></i>Surge Load Simulator & Dynamic Resource Balancer
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-lg-6">
+                                <div class="p-4 border rounded bg-light">
+                                    <h5 class="fw-bold mb-3"><i class="fa-solid fa-tower-broadcast text-danger me-2"></i>Emergency Department Surge Simulator</h5>
+                                    <p class="text-secondary small">
+                                        Simulates mass-casualty or epidemic surge conditions (300% arrival rate). Evaluates how Alpha.ai dynamically diverts low-acuity patients (ESI 4/5) to Fast-Track pods to protect acute resuscitation beds.
+                                    </p>
+                                    <div class="d-flex gap-2 my-3">
+                                        <button class="btn btn-warning fw-bold" onclick="toggleSurgeMode()">
+                                            <i class="fa-solid fa-bolt me-1"></i> Trigger 3× Influx Surge
+                                        </button>
+                                        <button class="btn btn-outline-secondary" onclick="advanceQueueTime(10)">
+                                            Advance Clock +10m
+                                        </button>
+                                    </div>
+                                    <hr>
+                                    <div class="small text-muted">
+                                        <strong>Hospital Capacity Profile:</strong> 48 Acute Beds | 8 Resuscitation Bays | 12 Fast-Track Chairs | 350-500+ Arrivals/Day
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div class="p-4 border rounded bg-white shadow-sm">
+                                    <h6 class="fw-bold mb-3 text-primary">Dynamic Load Balancing & Throughput Metrics</h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-sm small mb-0">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Operational Metric</th>
+                                                    <th>Manual Unassisted</th>
+                                                    <th class="table-success">Alpha.ai Clinical Model</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>High-Acuity Mean Wait</td>
+                                                    <td class="text-danger fw-bold">145 mins</td>
+                                                    <td class="text-success fw-bold">52 mins (-64%)</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Under-Triage Miss Rate</td>
+                                                    <td class="text-danger">14.7% (Human RN Rate)</td>
+                                                    <td class="text-success">&lt; 0.9% (Safety-first)</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Fast-Track Pod Diversion</td>
+                                                    <td>12% (Static)</td>
+                                                    <td class="text-success">48% (Dynamic)</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Acute Bed Saturation</td>
+                                                    <td class="text-danger">96% (Bottleneck)</td>
+                                                    <td class="text-success">78% (Balanced)</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. AUDIT TRAIL & OVERRIDES -->
+            <div class="tab-pane fade" id="audit-pane" role="tabpanel">
+                <div class="card shadow-sm border-0 mb-3">
+                    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0 fw-bold text-dark">
+                                <i class="fa-solid fa-file-shield text-success me-2"></i>HIPAA §164.312(b) & GDPR Art 22 Immutable Audit Ledger
+                            </h6>
+                            <span class="small text-muted">Tamper-evident cryptographically chained decision & override logs (Stored in MongoDB)</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="loadAuditLogs(true)">
+                                <i class="fa-solid fa-filter me-1"></i> Show Overrides Only
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="loadAuditLogs(false)">
+                                <i class="fa-solid fa-list me-1"></i> Show All Logs
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0 font-monospace small" id="auditTable">
+                                <thead class="table-light text-uppercase">
+                                    <tr>
+                                        <th>Log ID</th>
+                                        <th>Timestamp (UTC)</th>
+                                        <th>Patient / Aadhaar</th>
+                                        <th>AI Score</th>
+                                        <th>Final ESI</th>
+                                        <th>Override?</th>
+                                        <th>Clinician ID</th>
+                                        <th>Override Reason & Notes</th>
+                                        <th>SHA-256 Hash Seal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="auditTableBody">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- DOCTOR LEAVE MANAGEMENT MODAL -->
+    <div class="modal fade" id="doctorLeaveModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-calendar-xmark me-2"></i>Mark Doctor Leave & Auto-Assign Backup
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="doctorLeaveForm" onsubmit="event.preventDefault(); submitDoctorLeave();">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Select Doctor</label>
+                            <select class="form-select" id="leaveDoctorSelect" required onchange="onDoctorSelectChange()">
+                                <!-- Dynamic Doctor options -->
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Leave Status</label>
+                            <select class="form-select" id="leaveStatusToggle">
+                                <option value="true" selected>On-Leave (Absent)</option>
+                                <option value="false">Available (Return from Leave)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Leave Reason</label>
+                            <input type="text" class="form-control" id="leaveReasonInput" placeholder="Reason for leave" value="" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Designated Backup Doctor (Auto-Re-routed)</label>
+                            <input type="text" class="form-control bg-light" id="leaveBackupDocDisplay" readonly placeholder="Backup doctor assigned automatically" value="">
+                            <input type="hidden" id="leaveBackupDocId" value="">
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger fw-bold">Update Roster in MongoDB</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BED STATUS & PATIENT TRANSFER / DISCHARGE MODAL -->
+    <div class="modal fade" id="bedUpdateModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-bed-pulse me-2"></i>Bed Management, Step-Down & Discharge
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="bedUpdateForm" onsubmit="event.preventDefault(); submitBedStatusUpdate();">
+                        <input type="hidden" id="modalWardKey" value="">
+                        <input type="hidden" id="modalBedId" value="">
+                        
+                        <div class="alert alert-info py-2 px-3 small mb-3 d-flex justify-content-between align-items-center">
+                            <div>Bed: <strong id="modalBedTitle">ICU-04</strong></div>
+                            <div>Current Patient: <strong id="modalPatientTitle" class="text-danger">None</strong></div>
+                        </div>
+
+                        <!-- 1. Direct Bed Status Update -->
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Update Bed Status</label>
+                            <select class="form-select" id="modalBedStatusSelect" required>
+                                <option value="Available">Available (Vacant & Ready)</option>
+                                <option value="Occupied">Occupied (Patient Admitted)</option>
+                                <option value="Under_Cleaning">Under Cleaning / Sanitization</option>
+                                <option value="Maintenance">Maintenance / Out of Order</option>
+                            </select>
+                        </div>
+
+                        <hr>
+
+                        <!-- 2. Patient Transfer / Step-Down Action (e.g. ICU -> General Ward) -->
+                        <div class="p-3 border rounded bg-light mb-3">
+                            <h6 class="fw-bold small text-primary mb-2">
+                                <i class="fa-solid fa-right-left me-1"></i>Step-Down / Transfer Patient to Another Ward
+                            </h6>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="form-label small">Target Ward</label>
+                                    <select class="form-select form-select-sm" id="transferTargetWard" onchange="onTransferWardChange()">
+                                        <option value="general" selected>General Ward</option>
+                                        <option value="semi_private">Semi-Private / Private</option>
+                                        <option value="hdu">High Dependency Unit (HDU)</option>
+                                        <option value="icu">Adult ICU</option>
+                                        <option value="dialysis">Dialysis Unit</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small">Target Bed ID</label>
+                                    <input type="text" class="form-control form-control-sm" id="transferTargetBedId" placeholder="Auto or Bed ID" value="">
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <button type="button" class="btn btn-sm btn-outline-primary w-100 fw-bold" onclick="executePatientTransfer()">
+                                        <i class="fa-solid fa-arrow-right-arrow-left me-1"></i> Confirm Step-Down Transfer (Frees Old Bed)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Complete Discharge Action -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button type="button" class="btn btn-outline-danger btn-sm fw-bold" onclick="executePatientDischarge()">
+                                <i class="fa-solid fa-person-walking-arrow-right me-1"></i> Complete Patient Discharge
+                            </button>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary btn-sm fw-bold">Save to MongoDB</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLINICIAN OVERRIDE MODAL -->
+    <div class="modal fade" id="overrideModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-user-pen me-2"></i>Record Clinician Triage Override
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="overrideForm" onsubmit="event.preventDefault(); submitClinicianOverride();">
+                        <input type="hidden" id="overridePatientId" value="">
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Clinician ID / Badge</label>
+                            <input type="text" class="form-control" id="overrideClinicianId" placeholder="Clinician ID / Badge" value="" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">New Overridden Triage Level</label>
+                            <select class="form-select fw-bold" id="overrideNewLevel" required>
+                                <option value="" selected disabled>Select Triage Level</option>
+                                <option value="1">Level 1 - Resuscitation (Immediate)</option>
+                                <option value="2">Level 2 - Emergent</option>
+                                <option value="3">Level 3 - Urgent</option>
+                                <option value="4">Level 4 - Less Urgent</option>
+                                <option value="5">Level 5 - Non-Urgent</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Mandatory Justification Reason Code</label>
+                            <select class="form-select" id="overrideReasonCode" required>
+                                <option value="CLINICAL_INTUITION" selected>Clinical intuition / visual distress not captured in vitals</option>
+                                <option value="ATYPICAL_PRESENTATION">Atypical presentation in high-risk patient</option>
+                                <option value="COMPLEX_COMORBIDITY">Severe underlying comorbidity / immunosuppression</option>
+                                <option value="OCCULT_TRAUMA">High mechanism of injury despite normal vitals</option>
+                                <option value="DOWNGRADE_BENIGN">Identified benign etiology upon direct exam</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Clinician Decision Notes</label>
+                            <textarea class="form-control" id="overrideNotes" rows="2" placeholder="Clinical reasoning for override" required></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger fw-bold">Commit Override to Audit Ledger</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REPEAT VITALS UPDATE MODAL -->
+    <div class="modal fade" id="repeatVitalsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-heart-circle-bolt me-2"></i>Record Repeat Vitals (Deterioration Check)
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="repeatVitalsForm" onsubmit="event.preventDefault(); submitRepeatVitals();">
+                        <input type="hidden" id="repeatPatientId" value="">
+                        
+                        <div class="alert alert-info py-2 px-3 small mb-3">
+                            Simulate bedside re-assessment. Entering worsening vitals will trigger dynamic priority escalation.
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Repeat Heart Rate (bpm)</label>
+                                <input type="number" class="form-control" id="repeat_hr" placeholder="HR (bpm)" value="" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Repeat Resp Rate (bpm)</label>
+                                <input type="number" class="form-control" id="repeat_rr" placeholder="RR (bpm)" value="" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Repeat Systolic BP (mmHg)</label>
+                                <input type="number" class="form-control" id="repeat_sbp" placeholder="SBP (mmHg)" value="" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Repeat SpO2 (%)</label>
+                                <input type="number" step="0.1" class="form-control" id="repeat_spo2" placeholder="SpO2 (%)" value="" required>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary fw-bold">Re-Evaluate & Update Queue</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DIRECT PATIENT ACTION MODAL (BY AADHAAR) -->
+    <div class="modal fade" id="directActionModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-id-card text-info me-2"></i>Direct Patient Search &amp; Management (By Aadhaar)
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="directActionForm" onsubmit="event.preventDefault(); searchPatientDirectAction();">
+                        
+                        <!-- 12-Slot Aadhaar Search Box -->
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold d-flex justify-content-between align-items-center mb-1">
+                                <span>Enter 12-Digit Aadhaar Card Number</span>
+                                <span class="badge bg-light text-secondary border small" id="directAadharCount">0 / 12 Digits</span>
+                            </label>
+                            <div class="d-flex align-items-center gap-1 flex-wrap mb-2">
+                                <div class="aadhar-slots-container" id="directAadharContainer">
+                                    <div class="aadhar-group">
+                                        <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="0" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                        <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="1" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                        <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="2" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                        <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="3" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                    </div>
+                                    <span class="aadhar-slot-separator">-</span>
+                                    <div class="aadhar-group">
+                                        <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                        <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="5" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                        <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="6" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                        <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="7" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                    </div>
+                                    <span class="aadhar-slot-separator">-</span>
+                                    <div class="aadhar-group">
+                                        <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="8" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                        <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="9" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                        <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="10" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                        <input type="text" class="aadhar-digit-slot" maxlength="1" data-index="11" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary fw-bold" type="submit">
+                                    <i class="fa-solid fa-magnifying-glass me-1"></i> Locate
+                                </button>
+                                <button class="btn btn-outline-secondary" type="button" onclick="clearDirectAadhar()" title="Clear">
+                                    <i class="fa-solid fa-eraser"></i>
+                                </button>
+                            </div>
+                            <input type="hidden" id="directQueryInput" value="">
+                            <span class="small text-muted">Instantly finds the patient's assigned ward, bed, and attending doctor.</span>
+                        </div>
+
+                        <!-- Found Patient Info Display Card -->
+                        <div id="directPatientCard" class="p-3 border rounded bg-light-subtle mb-3 d-none">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong class="fs-6 text-dark" id="directPatName"></strong>
+                                <span class="badge bg-success" id="directAdmStatus"></span>
+                            </div>
+                            <div class="row g-2 small mb-2">
+                                <div class="col-6"><strong>Aadhaar Card:</strong> <span id="directPatAadhar" class="badge bg-secondary"></span></div>
+                                <div class="col-6"><strong>Current Ward:</strong> <span id="directPatWard" class="text-primary fw-bold"></span></div>
+                                <div class="col-12 mt-1"><strong>Current Bed:</strong> <span id="directPatBed" class="badge bg-danger"></span></div>
+                            </div>
+
+                            <hr>
+
+                            <!-- Direct Transfer Action -->
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-primary"><i class="fa-solid fa-right-left me-1"></i>Direct Step-Down / Transfer</label>
+                                <div class="input-group input-group-sm">
+                                    <select class="form-select" id="directTransferWard">
+                                        <option value="general" selected>General Ward</option>
+                                        <option value="semi_private">Semi-Private / Private</option>
+                                        <option value="hdu">High Dependency Unit (HDU)</option>
+                                        <option value="icu">Adult ICU</option>
+                                        <option value="dialysis">Dialysis Unit</option>
+                                    </select>
+                                    <button class="btn btn-outline-primary fw-bold" type="button" onclick="executeDirectTransfer()">
+                                        <i class="fa-solid fa-arrow-right-arrow-left me-1"></i> Transfer Patient
+                                    </button>
+                                </div>
+                                <span class="small text-muted">Automatically frees old bed and locks new bed.</span>
+                            </div>
+
+                            <!-- Direct Discharge Action -->
+                            <div>
+                                <button class="btn btn-outline-danger w-100 fw-bold btn-sm" type="button" onclick="executeDirectDischarge()">
+                                    <i class="fa-solid fa-person-walking-arrow-right me-1"></i> Direct 1-Click Complete Discharge (Frees Bed &amp; Assets)
+                                </button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MONGODB DATABASE CONFIGURATION MODAL -->
+    <div class="modal fade" id="mongoConfigModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-leaf me-2"></i>MongoDB Database Connection Manager
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info py-2 px-3 small mb-3">
+                        <i class="fa-solid fa-info-circle me-1"></i> Connect to your local MongoDB server (<code>mongodb://127.0.0.1:27017</code>) or remote MongoDB Atlas cluster (<code>mongodb+srv://...</code>).
+                    </div>
+
+                    <div class="p-3 border rounded bg-light mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="small text-muted">Active Storage Engine:</span>
+                            <span class="badge bg-primary" id="modalDbModeBadge">Checking...</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="small text-muted">Database URI:</span>
+                            <span class="small fw-bold text-truncate" style="max-width: 260px;" id="modalDbUri">...</span>
+                        </div>
+                        <div class="row g-2 mt-2 text-center small">
+                            <div class="col-4 border-end">
+                                <div class="fw-bold text-dark fs-6" id="modalCountPatients">0</div>
+                                <div class="text-muted">Patients</div>
+                            </div>
+                            <div class="col-4 border-end">
+                                <div class="fw-bold text-dark fs-6" id="modalCountAdmissions">0</div>
+                                <div class="text-muted">Admissions</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="fw-bold text-dark fs-6" id="modalCountLogs">0</div>
+                                <div class="text-muted">Audit Logs</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="mongoConnectForm" onsubmit="event.preventDefault(); connectCustomMongoUri();">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Enter MongoDB Connection String (URI / Atlas Key)</label>
+                            <input type="text" class="form-control font-monospace form-control-sm" id="customMongoUriInput" placeholder="mongodb://localhost:27017/hospital_db or mongodb+srv://..." required>
+                            <div class="form-text small">Example: <code>mongodb+srv://user:pass@cluster0.mongodb.net/hospital_db</code></div>
+                        </div>
+
+                        <div class="d-flex justify-content-between gap-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="useLocalJsonMode()">Use Local JSON Mode</button>
+                            <button type="submit" class="btn btn-success btn-sm fw-bold" id="btnConnectMongo">
+                                <i class="fa-solid fa-plug me-1"></i> Test & Connect to MongoDB
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

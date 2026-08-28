@@ -1,0 +1,624 @@
+[
+  {
+    "_id": "MAIN_HOSPITAL_RESOURCES",
+    "hospital_name": "Metro General Hospital & Research Institute",
+    "tier": "Level-1 Trauma & Super-Specialty Medical Center",
+    "wards": {
+      "general": {
+        "name": "General Ward (Male/Female)",
+        "total_beds": 30,
+        "occupied_beds": 19,
+        "target_esi": [
+          3,
+          4
+        ],
+        "beds": [
+          {
+            "id": "GEN-01",
+            "status": "Occupied",
+            "patient": "PT-G1"
+          },
+          {
+            "id": "GEN-02",
+            "status": "Occupied",
+            "patient": "PT-G2"
+          },
+          {
+            "id": "GEN-03",
+            "status": "Occupied",
+            "patient": "PT-G3"
+          },
+          {
+            "id": "GEN-04",
+            "status": "Occupied",
+            "patient": "PT-G4"
+          },
+          {
+            "id": "GEN-05",
+            "status": "Occupied",
+            "patient": "PT-G5"
+          },
+          {
+            "id": "GEN-06",
+            "status": "Occupied",
+            "patient": "PT-G6"
+          },
+          {
+            "id": "GEN-07",
+            "status": "Occupied",
+            "patient": "PT-G7"
+          },
+          {
+            "id": "GEN-08",
+            "status": "Occupied",
+            "patient": "PT-G8"
+          },
+          {
+            "id": "GEN-09",
+            "status": "Occupied",
+            "patient": "PT-G9"
+          },
+          {
+            "id": "GEN-10",
+            "status": "Occupied",
+            "patient": "PT-G10"
+          },
+          {
+            "id": "GEN-11",
+            "status": "Occupied",
+            "patient": "PT-G11"
+          },
+          {
+            "id": "GEN-12",
+            "status": "Occupied",
+            "patient": "PT-G12"
+          },
+          {
+            "id": "GEN-13",
+            "status": "Occupied",
+            "patient": "PT-G13"
+          },
+          {
+            "id": "GEN-14",
+            "status": "Occupied",
+            "patient": "PT-G14"
+          },
+          {
+            "id": "GEN-15",
+            "status": "Occupied",
+            "patient": "PT-G15"
+          },
+          {
+            "id": "GEN-16",
+            "status": "Occupied",
+            "patient": "PT-G16"
+          },
+          {
+            "id": "GEN-17",
+            "status": "Occupied",
+            "patient": "PT-G17"
+          },
+          {
+            "id": "GEN-18",
+            "status": "Occupied",
+            "patient": "PT-G18"
+          },
+          {
+            "id": "GEN-19",
+            "status": "Occupied",
+            "patient": "PT-9AB62C"
+          },
+          {
+            "id": "GEN-20",
+            "status": "Available",
+            "patient": null
+          },
+          {
+            "id": "GEN-21",
+            "status": "Available",
+            "patient": null
+          },
+          {
+            "id": "GEN-22",
+            "status": "Available",
+            "patient": null
+          },
+          {
+            "id": "GEN-23",
+            "status": "Available",
+            "patient": null
+          },
+          {
+            "id": "GEN-24",
+            "status": "Available",
+            "patient": null
+          },
+          {
+            "id": "GEN-25",
+            "status": "Available",
+            "patient": null
+          },
+          {
+            "id": "GEN-26",
+            "status": "Available",
+            "patient": null
+          },
+          {
+            "id": "GEN-27",
+            "status": "Available",
+            "patient": null
+          },
+          {
+            "id": "GEN-28",
+            "status": "Available",
+            "patient": null
+          },
+          {
+            "id": "GEN-29",
+            "status": "Available",
+            "patient": null
+          },
+          {
+            "id": "GEN-30",
+            "status": "Available",
+            "patient": null
+          }
+        ]
+      },
+      "semi_private": {
+        "name": "Semi-Private & Private Rooms",
+        "total_beds": 16,
+        "occupied_beds": 10,
+        "target_esi": [
+          3,
+          4
+        ],
+        "beds": [
+          {
+            "id": "PVT-01",
+            "status": "Occupied",
+            "patient": "PT-P1"
+          },
+          {
+            "id": "PVT-02",
+            "status": "Occupied",
+            "patient": "PT-P2"
+          },
+          {
+            "id": "PVT-03",
+            "status": "Occupied",
+            "patient": "PT-P3"
+          },
+          {
+            "id": "PVT-04",
+            "status": "Occupied",
+            "patient": "PT-P4"
+          },
+          {
+            "id": "PVT-05",
+            "status": "Occupied",
+            "patient": "PT-P5"
+          },
+          {
+            "id": "PVT-06",
+            "status": "Occupied",
+            "patient": "PT-P6"
+          },
+          {
+            "id": "PVT-07",
+            "status": "Occupied",
+            "patient": "PT-P7"
+          },
+          {
+            "id": "PVT-08",
+            "status": "Occupied",
+            "patient": "PT-P8"
+          },
+          {
+            "id": "PVT-09",
+            "status": "Occupied",
+            "patient": "PT-P9"
+          },
+          {
+            "id": "PVT-10",
+            "status": "Occupied",
+            "patient": "PT-P10"
+          },
+          {
+            "id": "PVT-11",
+            "status": "Available",
+            "patient": null
+          },
+          {
+            "id": "PVT-12",
+            "status": "Available",
+            "patient": null
+          },
+          {
+            "id": "PVT-13",
+            "status": "Available",
+            "patient": null
+          },
+          {
+            "id": "PVT-14",
+            "status": "Available",
+            "patient": null
+          },
+          {
+            "id": "PVT-15",
+            "status": "Available",
+            "patient": null
+          },
+          {
+            "id": "PVT-16",
+            "status": "Available",
+            "patient": null
+          }
+        ]
+      },
+      "hdu": {
+        "name": "High Dependency Unit (HDU / Cardiac Telemetry)",
+        "total_beds": 10,
+        "occupied_beds": 6,
+        "target_esi": [
+          2,
+          3
+        ],
+        "beds": [
+          {
+            "id": "HDU-01",
+            "status": "Occupied",
+            "patient": "PT-H1"
+          },
+          {
+            "id": "HDU-02",
+            "status": "Occupied",
+            "patient": "PT-H2"
+          },
+          {
+            "id": "HDU-03",
+            "status": "Occupied",
+            "patient": "PT-H3"
+          },
+          {
+            "id": "HDU-04",
+            "status": "Occupied",
+            "patient": "PT-H4"
+          },
+          {
+            "id": "HDU-05",
+            "status": "Occupied",
+            "patient": "PT-H5"
+          },
+          {
+            "id": "HDU-06",
+            "status": "Occupied",
+            "patient": "PT-H6"
+          },
+          {
+            "id": "HDU-07",
+            "status": "Available",
+            "patient": null
+          },
+          {
+            "id": "HDU-08",
+            "status": "Available",
+            "patient": null
+          },
+          {
+            "id": "HDU-09",
+            "status": "Available",
+            "patient": null
+          },
+          {
+            "id": "HDU-10",
+            "status": "Available",
+            "patient": null
+          }
+        ]
+      },
+      "icu": {
+        "name": "Adult Intensive Care Unit (ICU)",
+        "total_beds": 12,
+        "occupied_beds": 9,
+        "target_esi": [
+          1,
+          2
+        ],
+        "beds": [
+          {
+            "id": "ICU-01",
+            "status": "Occupied",
+            "ventilator": "VENT-1"
+          },
+          {
+            "id": "ICU-02",
+            "status": "Occupied",
+            "ventilator": "VENT-2"
+          },
+          {
+            "id": "ICU-03",
+            "status": "Occupied",
+            "ventilator": "VENT-3"
+          },
+          {
+            "id": "ICU-04",
+            "status": "Occupied",
+            "ventilator": "VENT-4"
+          },
+          {
+            "id": "ICU-05",
+            "status": "Occupied",
+            "ventilator": "VENT-5"
+          },
+          {
+            "id": "ICU-06",
+            "status": "Occupied",
+            "ventilator": "VENT-6"
+          },
+          {
+            "id": "ICU-07",
+            "status": "Occupied",
+            "ventilator": "VENT-7"
+          },
+          {
+            "id": "ICU-08",
+            "status": "Occupied",
+            "ventilator": "VENT-8"
+          },
+          {
+            "id": "ICU-09",
+            "status": "Occupied",
+            "ventilator": null,
+            "patient": "PT-4321-5482"
+          },
+          {
+            "id": "ICU-10",
+            "status": "Available",
+            "ventilator": null
+          },
+          {
+            "id": "ICU-11",
+            "status": "Available",
+            "ventilator": null
+          },
+          {
+            "id": "ICU-12",
+            "status": "Available",
+            "ventilator": null
+          }
+        ]
+      },
+      "nicu": {
+        "name": "Neonatal ICU (NICU - Newborns <28 Days)",
+        "total_beds": 8,
+        "occupied_beds": 4,
+        "target_esi": [
+          1,
+          2
+        ],
+        "beds": [
+          {
+            "id": "NICU-01",
+            "status": "Occupied",
+            "incubator": "INC-1"
+          },
+          {
+            "id": "NICU-02",
+            "status": "Occupied",
+            "incubator": "INC-2"
+          },
+          {
+            "id": "NICU-03",
+            "status": "Occupied",
+            "incubator": "INC-3"
+          },
+          {
+            "id": "NICU-04",
+            "status": "Occupied",
+            "incubator": "INC-4"
+          },
+          {
+            "id": "NICU-05",
+            "status": "Available",
+            "incubator": "INC-5"
+          },
+          {
+            "id": "NICU-06",
+            "status": "Available",
+            "incubator": "INC-6"
+          },
+          {
+            "id": "NICU-07",
+            "status": "Available",
+            "incubator": "INC-7"
+          },
+          {
+            "id": "NICU-08",
+            "status": "Available",
+            "incubator": "INC-8"
+          }
+        ]
+      },
+      "picu": {
+        "name": "Pediatric ICU (PICU - Children 1m to 16y)",
+        "total_beds": 6,
+        "occupied_beds": 3,
+        "target_esi": [
+          1,
+          2
+        ],
+        "beds": [
+          {
+            "id": "PICU-01",
+            "status": "Occupied"
+          },
+          {
+            "id": "PICU-02",
+            "status": "Occupied"
+          },
+          {
+            "id": "PICU-03",
+            "status": "Occupied"
+          },
+          {
+            "id": "PICU-04",
+            "status": "Available"
+          },
+          {
+            "id": "PICU-05",
+            "status": "Available"
+          },
+          {
+            "id": "PICU-06",
+            "status": "Available"
+          }
+        ]
+      },
+      "dialysis": {
+        "name": "Hemodialysis & Nephrology Unit",
+        "total_beds": 6,
+        "occupied_beds": 4,
+        "target_esi": [
+          2,
+          3
+        ],
+        "beds": [
+          {
+            "id": "DIA-01",
+            "status": "Occupied",
+            "machine": "DIA-MACH-1"
+          },
+          {
+            "id": "DIA-02",
+            "status": "Occupied",
+            "machine": "DIA-MACH-2"
+          },
+          {
+            "id": "DIA-03",
+            "status": "Occupied",
+            "machine": "DIA-MACH-3"
+          },
+          {
+            "id": "DIA-04",
+            "status": "Occupied",
+            "machine": "DIA-MACH-4"
+          },
+          {
+            "id": "DIA-05",
+            "status": "Available",
+            "machine": "DIA-MACH-5"
+          },
+          {
+            "id": "DIA-06",
+            "status": "Available",
+            "machine": "DIA-MACH-6"
+          }
+        ]
+      },
+      "fast_track": {
+        "name": "Outpatient Fast-Track / Minor Injury Pods",
+        "total_beds": 10,
+        "occupied_beds": 5,
+        "target_esi": [
+          4,
+          5
+        ],
+        "beds": [
+          {
+            "id": "FT-01",
+            "status": "Occupied"
+          },
+          {
+            "id": "FT-02",
+            "status": "Occupied"
+          },
+          {
+            "id": "FT-03",
+            "status": "Occupied"
+          },
+          {
+            "id": "FT-04",
+            "status": "Occupied"
+          },
+          {
+            "id": "FT-05",
+            "status": "Occupied"
+          },
+          {
+            "id": "FT-06",
+            "status": "Available"
+          },
+          {
+            "id": "FT-07",
+            "status": "Available"
+          },
+          {
+            "id": "FT-08",
+            "status": "Available"
+          },
+          {
+            "id": "FT-09",
+            "status": "Available"
+          },
+          {
+            "id": "FT-10",
+            "status": "Available"
+          }
+        ]
+      }
+    },
+    "medical_equipment": {
+      "dialysis_machines": {
+        "total": 6,
+        "in_use": 4,
+        "available": 2
+      },
+      "oxygen_cylinders": {
+        "full_stock": 50,
+        "in_use": 32,
+        "available": 18,
+        "central_pressure_psi": 142
+      },
+      "ventilators": {
+        "total": 16,
+        "in_use": 11,
+        "available": 5
+      },
+      "defibrillators": {
+        "total": 8,
+        "available": 8
+      }
+    },
+    "operation_theatres": [
+      {
+        "ot_id": "OT-1",
+        "name": "Emergency Trauma OT",
+        "status": "In_Surgery",
+        "current_surgeon": "Dr. Sneha Patel",
+        "case": "Standby for Trauma Influx"
+      },
+      {
+        "ot_id": "OT-2",
+        "name": "Cardiac Surgery Complex",
+        "status": "Available",
+        "current_surgeon": "Dr. Rajesh Sharma",
+        "case": "CABG (Expected End: 18:00)"
+      },
+      {
+        "ot_id": "OT-3",
+        "name": "General Laparoscopic OT",
+        "status": "Available",
+        "current_surgeon": null,
+        "case": null
+      },
+      {
+        "ot_id": "OT-4",
+        "name": "Orthopedic & Neuro OT",
+        "status": "Under_Sterilization",
+        "current_surgeon": null,
+        "case": "Cleaning (15m remaining)"
+      }
+    ]
+  }
+]

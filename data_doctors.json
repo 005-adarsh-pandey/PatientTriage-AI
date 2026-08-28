@@ -1,0 +1,85 @@
+[
+  {
+    "_id": "DOC-101",
+    "name": "Dr. Rajesh Sharma",
+    "specialty": "Cardiology",
+    "qualifications": "MD, DM (Cardio)",
+    "room": "OPD-12",
+    "phone": "+91-9876543210",
+    "status": "Available",
+    "backup_id": "DOC-107",
+    "on_leave": false,
+    "leave_reason": "Leave updated by Lead",
+    "substitute_id": "DOC-107"
+  },
+  {
+    "_id": "DOC-102",
+    "name": "Dr. Ananya Iyer",
+    "specialty": "Pediatrics & Neonatology",
+    "qualifications": "MD (Peds), Fellowship NICU",
+    "room": "NICU Suite",
+    "phone": "+91-9876543211",
+    "status": "Available",
+    "backup_id": "DOC-108"
+  },
+  {
+    "_id": "DOC-103",
+    "name": "Dr. Vikram Sethi",
+    "specialty": "Critical Care & ICU (Intensivist)",
+    "qualifications": "MD, EDIC (Critical Care)",
+    "room": "ICU Control",
+    "phone": "+91-9876543212",
+    "status": "Available",
+    "backup_id": "DOC-107"
+  },
+  {
+    "_id": "DOC-104",
+    "name": "Dr. Sneha Patel",
+    "specialty": "Trauma & Orthopedic Surgery",
+    "qualifications": "MS (Ortho), MCh (Trauma)",
+    "room": "OT-1 Complex",
+    "phone": "+91-9876543213",
+    "status": "Available",
+    "backup_id": "DOC-106"
+  },
+  {
+    "_id": "DOC-105",
+    "name": "Dr. Farhan Qureshi",
+    "specialty": "Nephrology & Dialysis",
+    "qualifications": "MD, DM (Nephrology)",
+    "room": "Dialysis Ward",
+    "phone": "+91-9876543214",
+    "status": "Available",
+    "backup_id": "DOC-101"
+  },
+  {
+    "_id": "DOC-106",
+    "name": "Dr. Priya Deshmukh",
+    "specialty": "General & Laparoscopic Surgery",
+    "qualifications": "MS, FMAS",
+    "room": "OT-3 Complex",
+    "phone": "+91-9876543215",
+    "status": "Available",
+    "backup_id": "DOC-104"
+  },
+  {
+    "_id": "DOC-107",
+    "name": "Dr. Amit Roy",
+    "specialty": "Emergency Medicine (Lead)",
+    "qualifications": "MD (Emergency Medicine)",
+    "room": "Triage Command",
+    "phone": "+91-9876543216",
+    "status": "Available",
+    "backup_id": "DOC-103"
+  },
+  {
+    "_id": "DOC-108",
+    "name": "Dr. Meera Nambiar",
+    "specialty": "General Medicine & Sepsis",
+    "qualifications": "MD (Internal Medicine)",
+    "room": "Ward Area A",
+    "phone": "+91-9876543217",
+    "status": "Available",
+    "backup_id": "DOC-102"
+  }
+]
