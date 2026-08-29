@@ -1,16 +1,115 @@
-# PatientTriage.ai — Clinical Decision Support & Real-Time Emergency Department Management System
+﻿# PatientTriage.ai
 
-[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
-[![Flask](https://img.shields.io/badge/Framework-Flask%203.1-blue.svg)](https://palletsprojects.com/p/flask/)
-[![MongoDB](https://img.shields.io/badge/Database-MongoDB%208.0%20%7C%20Compass-green.svg)](https://www.mongodb.com/)
-[![Compliance](https://img.shields.io/badge/Compliance-HIPAA%20%7C%20GDPR%20Art%2022-navy.svg)]()
-[![Clinical Safety](https://img.shields.io/badge/Clinical%20Safety-100%25-darkgreen.svg)]()
+PatientTriage.ai is an intelligent Clinical Decision Support System (CDSS) and
+real-time Emergency Department Resource Orchestration platform. It integrates
+cost-sensitive machine learning, age-stratified physiological norms, and a
+reactive MongoDB database to prioritize patient care, allocate hospital beds,
+monitor waiting room deterioration, and manage surge capacity under extreme
+operational constraints.
 
-> **PatientTriage.ai** is a Clinical Decision Support System (CDSS) and Emergency Department Resource Orchestration platform developed for Problem Track 2. It integrates cost-sensitive machine learning, age-stratified physiological norms, and a real-time MongoDB database to prioritize patient care, allocate hospital beds, monitor waiting room deterioration, and manage surge capacity under extreme operational constraints.
+For full project documentation and repository source, visit the
+[PatientTriage.ai project repository](https://github.com/005-adarsh-pandey/PatientTriage-AI).
+Submit bug reports and feature requests in the
+[issue queue](https://github.com/005-adarsh-pandey/PatientTriage-AI/issues).
 
----
 
-## System Architecture
+## Table of contents
+
+- [Requirements](#requirements)
+- [Recommended modules](#recommended-modules)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [System architecture](#system-architecture)
+- [Solution approach and key features](#solution-approach-and-key-features)
+    - [1. Hybrid cost-sensitive decision ensemble](#1-hybrid-cost-sensitive-decision-ensemble)
+    - [2. Age-stratified physiological modeling](#2-age-stratified-physiological-modeling)
+    - [3. Longitudinal Aadhaar UHID engine](#3-longitudinal-aadhaar-uhid-engine)
+    - [4. Real-time 82-bed hospital resource management](#4-real-time-82-bed-hospital-resource-management)
+    - [5. Dynamic queue and bedside deterioration monitoring](#5-dynamic-queue-and-bedside-deterioration-monitoring)
+    - [6. Surge mode 3x influx load balancing](#6-surge-mode-3x-influx-load-balancing)
+    - [7. Governance, HIPAA and GDPR compliance](#7-governance-hipaa-and-gdpr-compliance)
+- [Database schema](#database-schema)
+- [Verification and test benchmarks](#verification-and-test-benchmarks)
+- [Troubleshooting and FAQ](#troubleshooting-and-faq)
+- [Maintainers](#maintainers)
+
+
+## Requirements
+
+This application requires the following environment and runtime dependencies:
+
+- [Python 3.10+](https://www.python.org/downloads/)
+- [MongoDB Community Server 7.0+](https://www.mongodb.com/try/download/community) (running on localhost port 27017)
+- Python packages:
+    - [Flask](https://palletsprojects.com/p/flask/) 3.0+
+    - [PyMongo](https://pymongo.readthedocs.io/) 4.6+
+    - [Pandas](https://pandas.pydata.org/) 2.0+
+    - [NumPy](https://numpy.org/) 1.24+
+    - [Scikit-learn](https://scikit-learn.org/) 1.3+
+    - [Joblib](https://joblib.readthedocs.io/) 1.3+
+
+
+## Recommended modules
+
+The following optional tools and modules enhance local development, testing, and database visualization:
+
+- [MongoDB Compass](https://www.mongodb.com/products/tools/compass): Official GUI for visualizing real-time collection mutations in `hospital_db`.
+- [Postman](https://www.postman.com/): Useful for running automated API collection tests against Flask REST endpoints.
+
+
+## Installation
+
+1. Clone the repository to your local workspace:
+    ```bash
+    git clone https://github.com/005-adarsh-pandey/PatientTriage-AI.git
+    cd PatientTriage-AI
+    ```
+
+1. Create and activate a Python virtual environment:
+    ```bash
+    python -m venv .venv
+    # Windows PowerShell:
+    .\.venv\Scripts\Activate.ps1
+    # Linux / macOS:
+    source .venv/bin/activate
+    ```
+
+1. Install all runtime dependencies:
+    ```bash
+    pip install flask pymongo pandas scikit-learn joblib numpy
+    ```
+
+1. Ensure the local MongoDB service is running on port 27017:
+    ```bash
+    # Verify MongoDB service status (Windows)
+    Get-Service MongoDB
+    ```
+
+1. Seed the initial collections, 82-bed ward configurations, and physician rosters:
+    ```bash
+    python init_real_mongodb.py
+    ```
+
+
+## Configuration
+
+1. Set application environment variables if connecting to a custom MongoDB host or port (default is `mongodb://127.0.0.1:27017/`):
+    ```bash
+    # Optional override for remote MongoDB URI
+    $env:MONGO_URI="mongodb://127.0.0.1:27017/"
+    $env:PORT="5000"
+    ```
+
+1. Start the Flask application server:
+    ```bash
+    python app.py
+    ```
+
+1. Open your web browser and navigate to:
+    [http://localhost:5000](http://localhost:5000)
+
+
+## System architecture
 
 ```mermaid
 flowchart TD
@@ -64,88 +163,113 @@ flowchart TD
     API_Triage --> DB_Audit
 ```
 
----
 
-## Key Capabilities & Track 2 Solutions
+## Solution approach and key features
 
-### 1. Hybrid Decision Model
-- **Cost-Sensitive Ensemble**: Trained on clinical emergency data with a **10:1 asymmetric penalty** against under-triage errors.
-- **Uncertainty Quantification**: Calculates Shannon Entropy and Prediction Margins. When uncertainty is high, the system automatically defaults to a higher acuity level to protect patient safety.
-- **Explainable Output**: Highlights the top clinical drivers behind every triage decision.
 
-### 2. Age-Calibrated Physiological Modeling
-- **Pediatric Sub-Model (< 18 yrs)**: Validates against Pediatric Early Warning Score (PEWS), age-stratified respiratory/heart rate thresholds, stridor, and infant febrile triggers.
-- **Adult Sub-Model (18–64 yrs)**: Standard cardiovascular shock index ($\text{HR} / \text{SBP} \ge 0.9$), ischemic screening, and qSOFA criteria.
-- **Geriatric Sub-Model (65+ yrs)**: Compensates for blunted febrile responses ($\ge 37.8^\circ\text{C}$ flagged as occult sepsis), baseline dementia vs acute delirium, and beta-blocker suppression of tachycardia.
+### 1. Hybrid cost-sensitive decision ensemble
 
-### 3. Aadhaar-Based Identity & Longitudinal UHID
-- **Deterministic UHID Generation**: Generates unique permanent identifiers (e.g. `PT-4321-5482`) from Aadhaar numbers.
-- **Zero-Mutation Read Lookup**: Typing an Aadhaar executes a read-only query to retrieve past history without creating duplicate records.
-- **Cumulative Visit Tracking**: Increments `total_past_visits` upon formal admission.
+- **10:1 Asymmetric Cost Matrix**: Under-triage (assigning an unstable patient to a lower category) incurs a 10x penalty compared to over-triage during model optimization.
+- **Uncertainty Quantification**: Calculates Shannon entropy across KTAS prediction distributions. High-entropy scores automatically escalate the recommendation to a higher safety level.
+- **Explainable Clinical Drivers**: Returns top physiological drivers and risk ratios justifying every triage score.
 
-### 4. Real-Time Hospital Resource Management
-- **8 Dedicated Wards (82 Beds)**: Adult ICU, NICU, PICU, Cardiac HDU, Dialysis, Trauma OT, General Ward, Fast-Track Pods.
-- **Central Medical Gases & Devices**: Real-time tracking of central oxygen line pressure (PSI) and active ventilator inventory.
-- **1-Click Step-Down Transfer & Discharge**: Relocates patients and automatically transitions vacated beds to `Under_Cleaning` for sanitization.
 
-### 5. Dynamic Queue & Bedside Deterioration Monitoring
-- Enforces maximum safe waiting limits by triage level:
-  - **Level 1 (Resuscitation)**: Immediate ($0\text{ min}$)
-  - **Level 2 (Emergent)**: $\le 10\text{ min}$
-  - **Level 3 (Urgent)**: $\le 30\text{ min}$
-  - **Level 4 (Less Urgent)**: $\le 60\text{ min}$
-  - **Level 5 (Non-Urgent)**: $\le 120\text{ min}$
-- **Decompensation Alarms**: Re-evaluates patients when updated bedside vitals are entered. Worsening vitals trigger alarms and automatically elevate the patient's queue position.
+### 2. Age-stratified physiological modeling
 
-### 6. Surge Mode (3x Influx Load Balancing)
-- Simulates mass-casualty volume ($3\times$ baseline load).
-- Diverts non-urgent cases (Level 4/5) to Outpatient Fast-Track pods, protecting ICU/HDU capacity and reducing high-acuity wait times by **64.1%**.
+- **Pediatric Protocol (< 18 yrs)**: Integrates Pediatric Early Warning Score (PEWS), age-stratified respiratory rates, stridor checks, and infant febrile triggers.
+- **Adult Protocol (18–64 yrs)**: Validates cardiovascular Shock Index (HR / SBP >= 0.9), acute chest pain ischemic screen, and qSOFA sepsis criteria.
+- **Geriatric Protocol (65+ yrs)**: Detects blunted febrile responses (temp >= 37.8 C flagged as occult sepsis), baseline dementia vs acute delirium, and beta-blocker masked tachycardia.
 
-### 7. Governance, HIPAA & GDPR Compliance
-- **Human-in-the-Loop**: All recommendations require clinician confirmation. Overrides require mandatory structured reason codes and clinician IDs.
-- **SHA-256 Audit Trail**: Every triage decision, bed movement, discharge, and override is cryptographically logged in `hospital_db.audit_logs`.
 
----
+### 3. Longitudinal Aadhaar UHID engine
 
-## MongoDB Database Schema (`hospital_db`)
+- **Deterministic Hash Generation**: Generates permanent Unique Health Identifiers (e.g. `PT-4321-5482`) deterministically from patient Aadhaar credentials.
+- **Zero-Mutation Read Lookup**: Typing an Aadhaar executes a non-mutating query to fetch longitudinal visit history without creating duplicate patient entities.
+- **Visit Tracking**: Increments `total_past_visits` upon formal admission.
 
-| Collection | Description | Key Fields |
+
+### 4. Real-time 82-bed hospital resource management
+
+- **8 Dedicated Clinical Wards (82 Beds)**: Adult ICU, NICU, PICU, Cardiac HDU, Dialysis, Trauma OT, General Ward, and Fast-Track Pods.
+- **Central Medical Gases and Equipment**: Live telemetry tracking of central oxygen line pressure (PSI) and available mechanical ventilators.
+- **1-Click Step-Down Transfer & Discharge**: Vacating a bed automatically transitions status to `Under_Cleaning` for sanitation before re-allocation.
+
+
+### 5. Dynamic queue and bedside deterioration monitoring
+
+- Enforces KTAS Maximum Safe Waiting Limits:
+    - **Level 1 (Resuscitation)**: Immediate (0 min)
+    - **Level 2 (Emergent)**: <= 10 min
+    - **Level 3 (Urgent)**: <= 30 min
+    - **Level 4 (Less Urgent)**: <= 60 min
+    - **Level 5 (Non-Urgent)**: <= 120 min
+- **Bedside Decompensation Alarms**: Re-evaluates vitals entered at triage checkpoints. Deteriorating physiological parameters trigger visual alarms and auto-elevate queue priority.
+
+
+### 6. Surge mode 3x influx load balancing
+
+- Simulates mass casualty and surge events with 3x baseline patient influx.
+- Diverts non-urgent Level 4 and Level 5 presentations to Outpatient Fast-Track pods, protecting critical ICU/HDU capacity and reducing high-acuity wait times by **64.1%**.
+
+
+### 7. Governance, HIPAA and GDPR compliance
+
+- **Human-in-the-Loop Safeguards**: Clinicians review and confirm all AI recommendations. Overrides require mandatory structured clinical reason codes and Clinician IDs.
+- **SHA-256 Tamper-Evident Ledger**: Every admission, triage score, bed transfer, and clinician override is cryptographically hashed and logged to `hospital_db.audit_logs`.
+
+
+## Database schema
+
+The MongoDB database (`hospital_db`) uses the following collection architecture:
+
+| Collection | Description | Primary Key / Index Fields |
 | :--- | :--- | :--- |
-| `patients` | Master patient records & visit history | `_id`, `aadhar_no`, `masked_aadhar`, `name`, `age`, `gender`, `phone`, `total_past_visits`, `has_prior_history`, `registered_at` |
-| `admissions` | Hospital encounter records | `_id`, `patient_id`, `aadhar_no`, `vitals`, `triage_level`, `acuity_name`, `assigned_ward`, `assigned_bed_id`, `attending_doctor_id`, `status`, `discharge_timestamp` |
-| `hospital_resources` | Bed matrix & equipment stock | `_id: "MAIN_HOSPITAL_RESOURCES"`, `wards` (8 wards, 82 beds), `medical_equipment` (O2 PSI, ventilators), `operation_theatres` (OT 1 to 4) |
-| `doctors` | Physician directory & leave tracking | `_id`, `name`, `specialty`, `room`, `phone`, `status`, `on_leave`, `substitute_id` |
-| `staff` | Nursing & support staff roster | `_id`, `name`, `role`, `assigned_ward`, `shift`, `status` |
-| `audit_logs` | Tamper-evident cryptographic ledger | `_id`, `timestamp`, `event_type`, `patient_id`, `allocated_bed`, `triage_level`, `sha256_seal` |
+| `patients` | Master patient records and longitudinal history | `_id`, `aadhar_no`, `masked_aadhar`, `name`, `age`, `gender`, `phone`, `total_past_visits`, `has_prior_history`, `registered_at` |
+| `admissions` | Active hospital encounters and bed tracking | `_id`, `patient_id`, `aadhar_no`, `vitals`, `triage_level`, `acuity_name`, `assigned_ward`, `assigned_bed_id`, `attending_doctor_id`, `status`, `discharge_timestamp` |
+| `hospital_resources` | 82-Bed ward matrix and medical equipment | `_id: "MAIN_HOSPITAL_RESOURCES"`, `wards` (8 wards, 82 beds), `medical_equipment` (O2 PSI, ventilators), `operation_theatres` (OT 1 to 4) |
+| `doctors` | Physician directory, specialty and on-leave backups | `_id`, `name`, `specialty`, `room`, `phone`, `status`, `on_leave`, `substitute_id` |
+| `staff` | Nursing and triage support staff roster | `_id`, `name`, `role`, `assigned_ward`, `shift`, `status` |
+| `audit_logs` | Cryptographic SHA-256 chained compliance ledger | `_id`, `timestamp`, `event_type`, `patient_id`, `allocated_bed`, `triage_level`, `sha256_seal` |
 
----
 
-## Quick Start & Installation
+## Verification and test benchmarks
 
-### Prerequisites
-- Python 3.10+
-- MongoDB Community Server (port 27017)
-- MongoDB Compass
+Execute the automated test suite and database validation scripts:
 
-### 1. Install Dependencies
-```bash
-python -m pip install flask pymongo pandas scikit-learn joblib numpy
-```
+1. Run the clinical decision and edge-case benchmark suite:
+    ```bash
+    python test_cases.py
+    ```
 
-### 2. Initialize Database Collections
-```bash
-python init_real_mongodb.py
-```
+1. Verify complete database CRUD and ward integrity:
+    ```bash
+    python verify_all_db_updates.py
+    ```
 
-### 3. Start Application
-```bash
-python app.py
-```
-Open browser at: `http://localhost:5000`
+1. **Benchmark Results**:
+    - Safety Concordance: **100.0%**
+    - Under-Triage Rate: **0.0%**
+    - Database CRUD Integrity: **100% Passed (9/9 Modules)**
 
----
 
-## Clinical Validation Results
-- **Safety Concordance**: 100.0%
-- **Under-Triage Rate**: 0.0%
-- **Database CRUD Integrity**: 100% Passed (9/9 Modules)
+## Troubleshooting and FAQ
+
+If you encounter issues during installation or runtime, review the following troubleshooting steps:
+
+- **Problem**: Flask fails to connect to MongoDB with `ServerSelectionTimeoutError`.
+    - **Solution**: Ensure MongoDB Community Server is started locally. Run `net start MongoDB` or start the MongoDB service from Windows Service Manager.
+- **Problem**: Port 5000 is already in use by another service.
+    - **Solution**: Specify an alternative port before running `python app.py`:
+        ```powershell
+        $env:PORT="5001"
+        python app.py
+        ```
+- **Problem**: `init_real_mongodb.py` throws collection index conflicts.
+    - **Solution**: Open MongoDB Compass, drop the existing `hospital_db` database, and re-run `python init_real_mongodb.py` to recreate a fresh seed state.
+
+
+## Maintainers
+
+- Adarsh Pandey - [005-adarsh-pandey](https://github.com/005-adarsh-pandey)
+- Sachin Panwar - [sachin9644](https://github.com/sachin9644)
+- Ashutosh Shukla - [ashutoshshukla47](https://github.com/ashutoshshukla47)
